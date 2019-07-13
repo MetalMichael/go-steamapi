@@ -13,11 +13,11 @@ type gameServerInfoResponse struct {
 type GameServerKeyInfo struct {
 	SteamID    string
 	AppID      uint16
-	LoginToken string
+	LoginToken string `json:"login_token"`
 	Memo       string
-	IsDeleted  bool
-	IsExpired  bool
-	LastLogin  uint16 `json:"rt_last_logon"`
+	IsDeleted  bool   `json:"is_deleted"`
+	IsExpired  bool   `json:"is_expired"`
+	LastLogin  uint32 `json:"rt_last_logon"`
 }
 
 // GetGameServerInfo retrieves all GameServerLoginTokens and their info for a given key (account)
