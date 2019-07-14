@@ -1,6 +1,9 @@
 package steamapi
 
-import "net/url"
+import (
+	"net/url"
+	"strconv"
+)
 
 type gameServerInfoResponse struct {
 	Response struct {
@@ -9,10 +12,17 @@ type gameServerInfoResponse struct {
 	}
 }
 
+type gameServerCreateResponse struct {
+	Response struct {
+		SteamID    string
+		LoginToken string `json:"login_token"`
+	}
+}
+
 // GameServerKeyInfo contains the information about a GameServerLoginToken
 type GameServerKeyInfo struct {
 	SteamID    string
-	AppID      uint16
+	AppID      uint32
 	LoginToken string `json:"login_token"`
 	Memo       string
 	IsDeleted  bool   `json:"is_deleted"`
@@ -33,4 +43,20 @@ func GetGameServerInfo(apiKey string) ([]GameServerKeyInfo, error) {
 		return nil, err
 	}
 	return resp.Response.Servers, nil
+}
+
+func CreateGameServerKey(apiKey string, appId uint32, memo string) (string, error) {
+	createServerInfo := NewSteamMethod("IGameServersService", "CreateAccount", 1)
+
+	data := url.Values{}
+	data.Add("key", apiKey)
+	data.Add("appid", strconv.FormatUint(uint64(appId), 10))
+	data.Add("memo", memo)
+
+	var resp gameServerCreateResponse
+	err := createServerInfo.Request(data, &resp)
+	if err != nil {
+		return "", err
+	}
+	return resp.Response.LoginToken, nil
 }
