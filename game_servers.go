@@ -67,12 +67,12 @@ func CreateGameServerKey(apiKey string, appId uint32, memo string) (string, erro
 	return resp.Response.LoginToken, nil
 }
 
-func ResetGameServerKey(apiKey string, serverKey string) (string, error) {
+func ResetGameServerKey(apiKey string, steamId uint64) (string, error) {
 	createServerInfo := NewSteamMethod("IGameServersService", "ResetLoginToken", 1)
 
 	data := url.Values{}
 	data.Add("key", apiKey)
-	data.Add("steamId", serverKey)
+	data.Add("steamId", strconv.FormatUint(uint64(steamId), 10))
 
 	var resp gameServerResetResponse
 	err := createServerInfo.Request(data, &resp)
