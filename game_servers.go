@@ -19,6 +19,12 @@ type gameServerCreateResponse struct {
 	}
 }
 
+type gameServerResetResponse struct {
+	Response struct {
+		LoginToken string `json:"login_token"`
+	}
+}
+
 // GameServerKeyInfo contains the information about a GameServerLoginToken
 type GameServerKeyInfo struct {
 	SteamID    string
@@ -54,6 +60,21 @@ func CreateGameServerKey(apiKey string, appId uint32, memo string) (string, erro
 	data.Add("memo", memo)
 
 	var resp gameServerCreateResponse
+	err := createServerInfo.Request(data, &resp)
+	if err != nil {
+		return "", err
+	}
+	return resp.Response.LoginToken, nil
+}
+
+func ResetGameServerKey(apiKey string, serverKey string) (string, error) {
+	createServerInfo := NewSteamMethod("IGameServersService", "ResetLoginToken", 1)
+
+	data := url.Values{}
+	data.Add("key", apiKey)
+	data.Add("steamId", serverKey)
+
+	var resp gameServerResetResponse
 	err := createServerInfo.Request(data, &resp)
 	if err != nil {
 		return "", err
