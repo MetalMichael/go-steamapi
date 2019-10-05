@@ -48,3 +48,27 @@ func (s SteamMethod) Request(data url.Values, v interface{}) error {
 
 	return d.Decode(&v)
 }
+
+// Post makes a POST request to the Steam Web API with the given
+// url values and stores the result in v.
+//
+// Returns an error if the return status code was not 200.
+func (s SteamMethod) Post(data url.Values, v interface{}) error {
+	url := string(s)
+	if data != nil {
+		url += "?" + data.Encode()
+	}
+	resp, err := http.Post(url, "UTF8", nil)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("steamapi %s Status code %d", s, resp.StatusCode)
+	}
+
+	d := json.NewDecoder(resp.Body)
+
+	return d.Decode(&v)
+}
