@@ -12,11 +12,14 @@ type gameServerInfoResponse struct {
 	}
 }
 
+// CreateResponse contains the information about the created GameServerLoginToken
+type CreateResponse struct {
+	SteamID    string
+	LoginToken string `json:"login_token"`
+}
+
 type gameServerCreateResponse struct {
-	Response struct {
-		SteamID    string
-		LoginToken string `json:"login_token"`
-	}
+	Response CreateResponse
 }
 
 type gameServerResetResponse struct {
@@ -51,7 +54,7 @@ func GetGameServerInfo(apiKey string) ([]GameServerKeyInfo, error) {
 	return resp.Response.Servers, nil
 }
 
-func CreateGameServerKey(apiKey string, appId uint32, memo string) (string, error) {
+func CreateGameServerKey(apiKey string, appId uint32, memo string) (*CreateResponse, error) {
 	createServerInfo := NewSteamMethod("IGameServersService", "CreateAccount", 1)
 
 	data := url.Values{}
@@ -62,17 +65,17 @@ func CreateGameServerKey(apiKey string, appId uint32, memo string) (string, erro
 	var resp gameServerCreateResponse
 	err := createServerInfo.Request(data, &resp)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return resp.Response.LoginToken, nil
+	return &resp.Response, nil
 }
 
-func ResetGameServerKey(apiKey string, steamId uint64) (string, error) {
+func ResetGameServerKey(apiKey string, steamId string) (string, error) {
 	createServerInfo := NewSteamMethod("IGameServersService", "ResetLoginToken", 1)
 
 	data := url.Values{}
 	data.Add("key", apiKey)
-	data.Add("steamId", strconv.FormatUint(uint64(steamId), 10))
+	data.Add("steamId", steamId)
 
 	var resp gameServerResetResponse
 	err := createServerInfo.Request(data, &resp)
