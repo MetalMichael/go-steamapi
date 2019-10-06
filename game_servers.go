@@ -78,9 +78,24 @@ func ResetGameServerKey(apiKey string, steamId string) (string, error) {
 	data.Add("steamId", steamId)
 
 	var resp gameServerResetResponse
-	err := createServerInfo.Request(data, &resp)
+	err := createServerInfo.Post(data, &resp)
 	if err != nil {
 		return "", err
 	}
 	return resp.Response.LoginToken, nil
+}
+
+func DeleteGameServerKey(apiKey string, steamId string) error {
+	createServerInfo := NewSteamMethod("IGameServersService", "DeleteAccount", 1)
+
+	data := url.Values{}
+	data.Add("key", apiKey)
+	data.Add("steamId", steamId)
+
+	var resp interface{}
+	err := createServerInfo.Post(data, &resp)
+	if err != nil {
+		return err
+	}
+	return nil
 }
